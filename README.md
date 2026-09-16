@@ -1,159 +1,146 @@
-# Turborepo starter
+# Zelo — Production-Quality Collaborative Kanban Platform
 
-This Turborepo starter is maintained by the Turborepo core team.
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Bun](https://img.shields.io/badge/Bun-1.3+-F472B6?logo=bun&logoColor=white)](https://bun.sh/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-6.0+-2D3748?logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon_Serverless-4169E1?logo=postgresql&logoColor=white)](https://neon.tech/)
+[![Turborepo](https://img.shields.io/badge/Turborepo-2.0+-EF4444?logo=turborepo&logoColor=white)](https://turbo.build/)
 
-## Using this example
+Zelo is an enterprise-ready, real-time collaborative Kanban project management platform engineered with clean architecture, strict domain boundaries, and high-concurrency real-time capabilities.
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
+## 🎯 Architecture & Engineering Philosophy
+
+- **Backend & Database First**: Persisted PostgreSQL state is the single source of truth. Realtime WebSockets stream transitions; they do not hold authority.
+- **Strictly Passwordless Identity**: Users authenticate exclusively through **Google OAuth 2.0** and **GitHub OAuth 2.0**, backed by cryptographically secure, opaque 256-bit database sessions with HttpOnly/Secure/SameSite cookies. No password hashes, no reset tokens, no traditional JWTs.
+- **Floating-Point Fractional Kanban Ordering**: Card reordering operates via fractional midpoint positioning (`(posA + posB) / 2`), eliminating $O(N)$ row-rewrite penalties on single drag-and-drop operations.
+- **Multi-Tenant Hierarchical RBAC**: Fail-closed access validation across the resource cascade (`User -> Workspace -> Project -> Board -> Column -> Task`).
+- **Modular Monolith**: Designed for instant developer productivity while maintaining zero-cost extraction boundaries for future microservice extraction.
+
+---
+
+## 📚 Complete Engineering Documentation
+
+Comprehensive specifications, protocols, and guides are maintained in the [`docs/`](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs) directory:
+
+| Document | Description |
+| :--- | :--- |
+| 📖 [**Docs Index**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/README.md) | Complete documentation index and high-level platform summary |
+| 🏛️ [**Architecture**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/ARCHITECTURE.md) | System overview, module boundaries, request lifecycles, and microservice decoupling |
+| 🗺️ [**Implementation Plan**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/IMPLEMENTATION_PLAN.md) | 19-phase master development roadmap from backend foundation to UI integration |
+| 🗄️ [**Database Architecture**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/DATABASE.md) | Entity relationship diagram, schemas, fractional indexing, and Neon pooling |
+| 🔐 [**Authentication & Sessions**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/AUTHENTICATION.md) | Google & GitHub OAuth 2.0 flows, PKCE, state tokens, and session management |
+| 🔌 [**REST API (v1)**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/API.md) | REST API contracts, endpoints, request/response formats, and error codes |
+| ⚡ [**WebSocket Realtime**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/WEBSOCKET.md) | Native Bun WebSocket protocol, room hierarchy, event dispatching, and heartbeat |
+| 🧩 [**Domain Services**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/SERVICES.md) | Public service interfaces, domain responsibilities, and extraction readiness |
+| 🛡️ [**Security & Hardening**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/SECURITY.md) | Threat modeling, CSRF, XSS defense, CORS, and rate limiting |
+| 🧪 [**Testing Strategy**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/TESTING.md) | Vitest test suites, concurrent move tests, and integration testing |
+| 🚀 [**Deployment & Infrastructure**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/DEPLOYMENT.md) | Production cloud deployment, reverse proxies, and health check probes |
+| ⚠️ [**Error Handling**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/ERROR_HANDLING.md) | Centralized error hierarchy, status code catalog, and error envelopes |
+| ⚙️ [**Configuration**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/CONFIGURATION.md) | Zod-validated environment schema, secret management, and defaults |
+| 💻 [**Local Development**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/DEVELOPMENT.md) | Step-by-step developer onboarding, Bun commands, and migrations |
+
+---
+
+## 🗂️ Monorepo Structure
+
+```
+root/
+├── apps/
+│   ├── web/                     # Next.js 16 (React 19) App Router frontend
+│   └── backend/                 # Bun HTTP REST API & WebSocket server
+│
+├── packages/
+│   ├── db/                      # Prisma schema, migrations & client (@kanban/db)
+│   ├── types/                   # Shared TypeScript models & contracts (@kanban/types)
+│   ├── validation/              # Zod validation schemas (@kanban/validation)
+│   ├── config/                  # Validated environment configuration (@kanban/config)
+│   ├── logger/                  # Structured JSON logger (@kanban/logger)
+│   ├── errors/                  # Standardized error hierarchy (@kanban/errors)
+│   ├── eslint-config/           # Shared ESLint configuration
+│   ├── typescript-config/       # Standardized TypeScript presets
+│   └── ui/                      # Shared React component library
+│
+├── docs/                        # Architecture & engineering documentation
+├── package.json                 # Monorepo workspaces definition
+├── turbo.json                   # Turborepo task pipeline
+└── bun.lock                     # Bun lockfile
 ```
 
-## What's inside?
+---
 
-This Turborepo includes the following packages/apps:
+## 🚀 Quickstart
 
-### Apps and Packages
+### 1. Prerequisites
+- [Bun](https://bun.sh/) (v1.2+)
+- [Node.js](https://nodejs.org/) (v20+ or v24+)
+- Neon PostgreSQL Account ([neon.tech](https://neon.tech))
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `@next/eslint-plugin-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+### 2. Install Dependencies
+```bash
+bun install
 ```
 
-Without global `turbo`, use your package manager:
+### 3. Environment Variables
+Copy `.env.example` to `.env`:
+```bash
+cp .env.example .env
+```
+Fill in your database URLs and OAuth credentials (see [CONFIGURATION.md](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/CONFIGURATION.md)).
 
-```sh
-cd my-turborepo
-npx turbo build
-bun exec turbo build
-bun exec turbo build
+### 4. Database Setup
+```bash
+# Push schema and create migrations in Neon
+bun run --filter @kanban/db db:migrate
+
+# Seed database with sample teams, projects, and Kanban cards
+bun run --filter @kanban/db db:seed
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo build --filter=docs
+### 5. Launch Development Servers
+```bash
+bun run dev
 ```
 
-Without global `turbo`:
+- **Frontend Application**: `http://localhost:3000`
+- **Backend API & WebSockets**: `http://localhost:4000`
+- **Health Check**: `http://localhost:4000/health`
 
-```sh
-npx turbo build --filter=docs
-bun exec turbo build --filter=docs
-bun exec turbo build --filter=docs
+---
+
+## 🧪 Testing
+
+```bash
+# Run tests across all workspaces
+bun run test
+
+# Run tests with coverage
+bun --filter backend test -- --coverage
 ```
 
-### Develop
+---
 
-To develop all apps and packages, run the following command:
+## 🗺️ Implementation Phases
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-bun exec turbo dev
-bun exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-bun exec turbo dev --filter=web
-bun exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-bun exec turbo login
-bun exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-bun exec turbo link
-bun exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+Follow the complete roadmap defined in [IMPLEMENTATION_PLAN.md](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/IMPLEMENTATION_PLAN.md):
+- **Phase 0**: Repository Inspection ✅
+- **Phase 1**: Backend Foundation
+- **Phase 2**: Database Architecture
+- **Phase 3**: Prisma + Neon Integration
+- **Phase 4**: OAuth Authentication (Google & GitHub)
+- **Phase 5**: Workspace + RBAC
+- **Phase 6**: Projects + Boards
+- **Phase 7**: Columns + Tasks
+- **Phase 8**: Kanban Ordering & Atomic Movement
+- **Phase 9**: Comments + Labels + Checklists
+- **Phase 10**: Activity & Audit Logging
+- **Phase 11**: In-App Notifications
+- **Phase 12**: Realtime WebSocket System
+- **Phase 13**: Analytics Engine
+- **Phase 14**: Workspace Search
+- **Phase 15**: Attachments Architecture
+- **Phase 16**: Test Automation Suite
+- **Phase 17**: Production Hardening
+- **Phase 18**: Next.js Frontend Integration
