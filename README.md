@@ -1,4 +1,4 @@
-# Zelo — Production-Quality Collaborative Kanban Platform
+# Zelo Production-Quality Collaborative Kanban Platform
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Bun](https://img.shields.io/badge/Bun-1.3+-F472B6?logo=bun&logoColor=white)](https://bun.sh/)
