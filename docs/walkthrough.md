@@ -109,19 +109,105 @@ Also updated: root [`README.md`](file:///c:/Users/R.K%20Singh/Desktop/kanban/REA
 
 ---
 
+### Phase 4: OAuth Authentication ✅
+
+Full OAuth 2.0 implementation with Google and GitHub, user resolution, and session management:
+
+| File | Purpose |
+| :--- | :--- |
+| [`apps/backend/src/modules/auth/auth.types.ts`](file:///c:/Users/R.K%20Singh/Desktop/kanban/apps/backend/src/modules/auth/auth.types.ts) | OAuth and session TypeScript interfaces |
+| [`apps/backend/src/modules/auth/auth.repository.ts`](file:///c:/Users/R.K%20Singh/Desktop/kanban/apps/backend/src/modules/auth/auth.repository.ts) | SHA-256 token hashing, session DB storage, OAuth account linking |
+| [`apps/backend/src/modules/auth/auth.service.ts`](file:///c:/Users/R.K%20Singh/Desktop/kanban/apps/backend/src/modules/auth/auth.service.ts) | Google & GitHub OAuth state, token exchange, user resolution |
+| [`apps/backend/src/modules/auth/auth.controller.ts`](file:///c:/Users/R.K%20Singh/Desktop/kanban/apps/backend/src/modules/auth/auth.controller.ts) | HTTP handlers, HttpOnly session cookies, `/me`, `/logout` |
+| [`apps/backend/src/modules/auth/auth.routes.ts`](file:///c:/Users/R.K%20Singh/Desktop/kanban/apps/backend/src/modules/auth/auth.routes.ts) | URL routing for `/api/v1/auth/*` |
+| [`apps/backend/src/middleware/auth.ts`](file:///c:/Users/R.K%20Singh/Desktop/kanban/apps/backend/src/middleware/auth.ts) | Session cookie validation middleware `requireAuth` |
+
+**Verified endpoints:**
+- `GET /api/v1/auth/google` → 302 Redirect to Google OAuth consent
+- `GET /api/v1/auth/github` → 302 Redirect to GitHub OAuth consent
+- `GET /api/v1/auth/me` → 401 Unauthorized without session / 200 with user profile
+- `POST /api/v1/auth/logout` → 200 Cleared cookie `zelo_session=; Max-Age=0`
+
+---
+
+### Phase 5: Workspace + RBAC ✅
+
+Full Workspace CRUD and Role-Based Access Control (`OWNER`, `ADMIN`, `MEMBER`, `VIEWER`):
+
+| File | Purpose |
+| :--- | :--- |
+| [`apps/backend/src/middleware/rbac.ts`](file:///c:/Users/R.K%20Singh/Desktop/kanban/apps/backend/src/middleware/rbac.ts) | Role hierarchy level checks and member authorization |
+| [`apps/backend/src/modules/workspaces/workspace.types.ts`](file:///c:/Users/R.K%20Singh/Desktop/kanban/apps/backend/src/modules/workspaces/workspace.types.ts) | Workspace DTOs and types |
+| [`apps/backend/src/modules/workspaces/workspace.repository.ts`](file:///c:/Users/R.K%20Singh/Desktop/kanban/apps/backend/src/modules/workspaces/workspace.repository.ts) | Prisma queries for workspaces and membership |
+| [`apps/backend/src/modules/workspaces/workspace.service.ts`](file:///c:/Users/R.K%20Singh/Desktop/kanban/apps/backend/src/modules/workspaces/workspace.service.ts) | Slug generation, RBAC rules, member demotion/removal guards |
+| [`apps/backend/src/modules/workspaces/workspace.controller.ts`](file:///c:/Users/R.K%20Singh/Desktop/kanban/apps/backend/src/modules/workspaces/workspace.controller.ts) | REST endpoints for workspaces and members |
+| [`apps/backend/src/modules/workspaces/workspace.routes.ts`](file:///c:/Users/R.K%20Singh/Desktop/kanban/apps/backend/src/modules/workspaces/workspace.routes.ts) | `/api/v1/workspaces/*` route dispatcher |
+
+**Verified endpoints:**
+- `GET /api/v1/workspaces` (200)
+- `POST /api/v1/workspaces` (201)
+- `GET /api/v1/workspaces/:id` (200)
+- `PATCH /api/v1/workspaces/:id` (200)
+- `GET /api/v1/workspaces/:id/members` (200)
+- `POST /api/v1/workspaces/:id/members` (201)
+- `PATCH /api/v1/workspaces/:id/members/:userId` (200)
+- `DELETE /api/v1/workspaces/:id/members/:userId` (200)
+- `DELETE /api/v1/workspaces/:id` (200)
+
+---
+
+### Phase 6: Projects + Boards ✅
+
+Project hierarchy and Board management with automatic default Kanban columns:
+
+| File | Purpose |
+| :--- | :--- |
+| [`apps/backend/src/modules/projects/`](file:///c:/Users/R.K%20Singh/Desktop/kanban/apps/backend/src/modules/projects) | Project CRUD, workspace association, color & icon metadata |
+| [`apps/backend/src/modules/boards/`](file:///c:/Users/R.K%20Singh/Desktop/kanban/apps/backend/src/modules/boards) | Board CRUD with auto-creation of 4 default columns ("To Do", "In Progress", "In Review", "Done") |
+
+**Verified endpoints:**
+- `POST /api/v1/workspaces/:workspaceId/projects` (201)
+- `GET /api/v1/workspaces/:workspaceId/projects` (200)
+- `GET /api/v1/projects/:projectId` (200)
+- `PATCH /api/v1/projects/:projectId` (200)
+- `POST /api/v1/projects/:projectId/boards` (201, initializes 4 default columns)
+- `GET /api/v1/projects/:projectId/boards` (200)
+- `GET /api/v1/boards/:boardId` (200, returns columns and nested tasks)
+- `PATCH /api/v1/boards/:boardId` (200)
+- `DELETE /api/v1/boards/:boardId` (200)
+- `DELETE /api/v1/projects/:projectId` (200)
+
+---
+
+### Phase 7 & 8: Columns + Tasks + Kanban Ordering ✅
+
+Full Column and Task management with Floating-Point Fractional Indexing and Atomic Movement:
+
+| File | Purpose |
+| :--- | :--- |
+| [`apps/backend/src/modules/columns/`](file:///c:/Users/R.K%20Singh/Desktop/kanban/apps/backend/src/modules/columns) | Column CRUD, custom columns, column position reordering and rebalancing |
+| [`apps/backend/src/modules/tasks/`](file:///c:/Users/R.K%20Singh/Desktop/kanban/apps/backend/src/modules/tasks) | Task CRUD, assignees, labels, atomic movement `PATCH /tasks/:id/move`, auto-rebalance, activity audit logging |
+
+**Verified endpoints:**
+- `POST /api/v1/boards/:boardId/columns` (201)
+- `PATCH /api/v1/columns/:columnId` (200)
+- `PATCH /api/v1/columns/:columnId/move` (200)
+- `POST /api/v1/columns/:columnId/tasks` (201)
+- `GET /api/v1/tasks/:taskId` (200)
+- `PATCH /api/v1/tasks/:taskId` (200)
+- `PATCH /api/v1/tasks/:taskId/move` (200, tested relative drop: 1000 + 2000 → 1500.0)
+- `PATCH /api/v1/tasks/:taskId/move` cross-column (200)
+- `DELETE /api/v1/tasks/:taskId` (200, logs `TASK_DELETED` activity)
+- `DELETE /api/v1/columns/:columnId` (200)
+
 ---
 
 ## 🔲 What Needs To Be Done (Remaining Phases)
 
 | Phase | Title | Key Deliverables |
 | :--- | :--- | :--- |
-| **Phase 4** | **OAuth Authentication** | Google OAuth 2.0, GitHub OAuth 2.0, session minting, session cookies, `/api/v1/auth/*` endpoints, logout |
-| **Phase 5** | **Workspace + RBAC** | Workspace CRUD, member management, role-based authorization middleware (OWNER/ADMIN/MEMBER/VIEWER) |
-| **Phase 6** | **Projects + Boards** | Project CRUD, board creation, default columns on new board |
-| **Phase 7** | **Columns + Tasks** | Column CRUD + reordering, Task CRUD with priority and assignees |
-| **Phase 8** | **Kanban Ordering** | Fractional float positioning algorithm, atomic task movement `PATCH /tasks/:id/move`, auto-rebalancing |
 | **Phase 9** | **Comments + Labels + Checklists** | Task discussions, workspace label palette, checklist items with completion |
-| **Phase 10** | **Activity / Audit Log** | Structured activity events (`TASK_MOVED`, `TASK_ASSIGNED`, etc.), activity stream queries |
+| **Phase 10** | **Activity / Audit Log** | Structured activity stream queries, filters by board/task/user |
 | **Phase 11** | **Notifications** | In-app notifications on assignment, mentions, due dates; read/unread management |
 | **Phase 12** | **WebSocket Realtime** | Native Bun WebSocket server, room subscriptions (`board:*`, `workspace:*`), live event broadcasting |
 | **Phase 13** | **Analytics** | Task velocity, completion rate, priority distribution, overdue tracking |
@@ -140,11 +226,11 @@ Phase 0  [████████████████████] 100%  Re
 Phase 1  [████████████████████] 100%  Foundation Packages
 Phase 2  [████████████████████] 100%  Database Architecture
 Phase 3  [████████████████████] 100%  Prisma + Neon Integration
-Phase 4  [░░░░░░░░░░░░░░░░░░░░]   0%  OAuth Authentication
-Phase 5  [░░░░░░░░░░░░░░░░░░░░]   0%  Workspace + RBAC
-Phase 6  [░░░░░░░░░░░░░░░░░░░░]   0%  Projects + Boards
-Phase 7  [░░░░░░░░░░░░░░░░░░░░]   0%  Columns + Tasks
-Phase 8  [░░░░░░░░░░░░░░░░░░░░]   0%  Kanban Ordering
+Phase 4  [████████████████████] 100%  OAuth Authentication
+Phase 5  [████████████████████] 100%  Workspace + RBAC
+Phase 6  [████████████████████] 100%  Projects + Boards
+Phase 7  [████████████████████] 100%  Columns + Tasks
+Phase 8  [████████████████████] 100%  Kanban Ordering
 Phase 9  [░░░░░░░░░░░░░░░░░░░░]   0%  Comments + Labels + Checklists
 Phase 10 [░░░░░░░░░░░░░░░░░░░░]   0%  Activity / Audit
 Phase 11 [░░░░░░░░░░░░░░░░░░░░]   0%  Notifications
@@ -156,8 +242,7 @@ Phase 16 [░░░░░░░░░░░░░░░░░░░░]   0%  Te
 Phase 17 [░░░░░░░░░░░░░░░░░░░░]   0%  Production Hardening
 Phase 18 [░░░░░░░░░░░░░░░░░░░░]   0%  Frontend Integration
 
-Overall: ██████░░░░░░░░░░░░░░ ~22% complete (4/19 phases)
+Overall: ██████████░░░░░░░░░░ ~47% complete (9/19 phases)
 ```
 
-> **Next up: Phase 4 — OAuth Authentication (Google + GitHub)**
-> Say the word and I'll start building it, bro! 🚀
+> **Next up: Phase 9 — Comments + Labels + Checklists**
