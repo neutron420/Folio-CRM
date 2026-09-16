@@ -11,7 +11,7 @@ Zelo is an enterprise-ready, real-time collaborative Kanban project management p
 
 ---
 
-## 🎯 Architecture & Engineering Philosophy
+## Architecture & Engineering Philosophy
 
 - **Backend & Database First**: Persisted PostgreSQL state is the single source of truth. Realtime WebSockets stream transitions; they do not hold authority.
 - **Strictly Passwordless Identity**: Users authenticate exclusively through **Google OAuth 2.0** and **GitHub OAuth 2.0**, backed by cryptographically secure, opaque 256-bit database sessions with HttpOnly/Secure/SameSite cookies. No password hashes, no reset tokens, no traditional JWTs.
@@ -21,30 +21,30 @@ Zelo is an enterprise-ready, real-time collaborative Kanban project management p
 
 ---
 
-## 📚 Complete Engineering Documentation
+## Complete Engineering Documentation
 
 Comprehensive specifications, protocols, and guides are maintained in the [`docs/`](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs) directory:
 
 | Document | Description |
 | :--- | :--- |
-| 📖 [**Docs Index**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/README.md) | Complete documentation index and high-level platform summary |
-| 🏛️ [**Architecture**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/ARCHITECTURE.md) | System overview, module boundaries, request lifecycles, and microservice decoupling |
-| 🗺️ [**Implementation Plan**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/IMPLEMENTATION_PLAN.md) | 19-phase master development roadmap from backend foundation to UI integration |
-| 🗄️ [**Database Architecture**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/DATABASE.md) | Entity relationship diagram, schemas, fractional indexing, and Neon pooling |
-| 🔐 [**Authentication & Sessions**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/AUTHENTICATION.md) | Google & GitHub OAuth 2.0 flows, PKCE, state tokens, and session management |
-| 🔌 [**REST API (v1)**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/API.md) | REST API contracts, endpoints, request/response formats, and error codes |
-| ⚡ [**WebSocket Realtime**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/WEBSOCKET.md) | Native Bun WebSocket protocol, room hierarchy, event dispatching, and heartbeat |
-| 🧩 [**Domain Services**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/SERVICES.md) | Public service interfaces, domain responsibilities, and extraction readiness |
-| 🛡️ [**Security & Hardening**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/SECURITY.md) | Threat modeling, CSRF, XSS defense, CORS, and rate limiting |
-| 🧪 [**Testing Strategy**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/TESTING.md) | Vitest test suites, concurrent move tests, and integration testing |
-| 🚀 [**Deployment & Infrastructure**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/DEPLOYMENT.md) | Production cloud deployment, reverse proxies, and health check probes |
-| ⚠️ [**Error Handling**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/ERROR_HANDLING.md) | Centralized error hierarchy, status code catalog, and error envelopes |
-| ⚙️ [**Configuration**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/CONFIGURATION.md) | Zod-validated environment schema, secret management, and defaults |
-| 💻 [**Local Development**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/DEVELOPMENT.md) | Step-by-step developer onboarding, Bun commands, and migrations |
+| [**Docs Index**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/README.md) | Complete documentation index and high-level platform summary |
+| [**Architecture**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/ARCHITECTURE.md) | System overview, module boundaries, request lifecycles, and microservice decoupling |
+| [**Implementation Plan**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/IMPLEMENTATION_PLAN.md) | 19-phase master development roadmap from backend foundation to UI integration |
+| [**Database Architecture**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/DATABASE.md) | Entity relationship diagram, schemas, fractional indexing, and Neon pooling |
+| [**Authentication & Sessions**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/AUTHENTICATION.md) | Google & GitHub OAuth 2.0 flows, PKCE, state tokens, and session management |
+| [**REST API (v1)**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/API.md) | REST API contracts, endpoints, request/response formats, and error codes |
+| [**WebSocket Realtime**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/WEBSOCKET.md) | Native Bun WebSocket protocol, room hierarchy, event dispatching, and heartbeat |
+| [**Domain Services**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/SERVICES.md) | Public service interfaces, domain responsibilities, and extraction readiness |
+| [**Security & Hardening**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/SECURITY.md) | Threat modeling, CSRF, XSS defense, CORS, and rate limiting |
+| [**Testing Strategy**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/TESTING.md) | Vitest test suites, concurrent move tests, and integration testing |
+| [**Deployment & Infrastructure**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/DEPLOYMENT.md) | Production cloud deployment, reverse proxies, and health check probes |
+| [**Error Handling**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/ERROR_HANDLING.md) | Centralized error hierarchy, status code catalog, and error envelopes |
+| [**Configuration**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/CONFIGURATION.md) | Zod-validated environment schema, secret management, and defaults |
+| [**Local Development**](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/DEVELOPMENT.md) | Step-by-step developer onboarding, Bun commands, and migrations |
 
 ---
 
-## 🗂️ Monorepo Structure
+## Monorepo Structure
 
 ```
 root/
@@ -71,7 +71,7 @@ root/
 
 ---
 
-## 🚀 Quickstart
+## Quickstart
 
 ### 1. Prerequisites
 - [Bun](https://bun.sh/) (v1.2+)
@@ -110,7 +110,7 @@ bun run dev
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run tests across all workspaces
@@ -122,7 +122,7 @@ bun --filter backend test -- --coverage
 
 ---
 
-## 🗺️ Implementation Phases
+## Implementation Phases
 
 Follow the complete roadmap defined in [IMPLEMENTATION_PLAN.md](file:///c:/Users/R.K%20Singh/Desktop/kanban/docs/IMPLEMENTATION_PLAN.md):
 - **Phase 0**: Repository Inspection ✅
