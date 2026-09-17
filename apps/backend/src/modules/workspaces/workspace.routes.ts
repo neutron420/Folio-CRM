@@ -3,10 +3,7 @@ import { handleError } from "../../middleware/error-handler";
 import { workspaceController } from "./workspace.controller";
 import { projectController } from "../projects";
 
-/**
- * Handles all /api/v1/workspaces/* requests.
- * Returns Response if handled, or null if no route matched.
- */
+
 export async function handleWorkspaceRoutes(
   req: Request,
   pathname: string,
