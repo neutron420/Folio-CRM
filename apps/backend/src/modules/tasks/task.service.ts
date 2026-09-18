@@ -37,11 +37,8 @@ export class TaskService {
       throw new ValidationError("Task title cannot exceed 255 characters");
     }
 
-    let position = input.position;
-    if (position === undefined) {
-      const last = await taskRepository.findLastInColumn(columnId);
-      position = last ? last.position + 1000.0 : 1000.0;
-    }
+    const last = input.position === undefined ? await taskRepository.findLastInColumn(columnId) : null;
+    const position: number = input.position ?? (last ? last.position + 1000.0 : 1000.0);
 
     const created = await taskRepository.create(
       column.boardId,
