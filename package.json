@@ -9,8 +9,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "test": "turbo run test",
-    "postinstall": "cd packages/db && bun run db:generate",
-    "strip-comments": "bun run scripts/strip-comments.ts"
+    "postinstall": "cd packages/db && bun run db:generate"
   },
   "devDependencies": {
     "prettier": "3.9.6",
