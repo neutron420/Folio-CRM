@@ -29,13 +29,16 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Generate Prisma Client
-        run: bun --cwd packages/db run db:generate
+        working-directory: packages/db
+        run: bun run db:generate
 
       - name: Check TypeScript types
         run: bun run check-types
 
       - name: Run Backend Unit Tests (Jest)
-        run: bun --cwd apps/backend test
+        working-directory: apps/backend
+        run: bun run test
 
       - name: Run Backend Tests (Bun Test)
-        run: bun --cwd apps/backend test:bun
+        working-directory: apps/backend
+        run: bun test
