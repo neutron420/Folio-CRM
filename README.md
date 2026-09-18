@@ -110,7 +110,7 @@ flowchart TB
         GitHubIdP["GitHub OAuth 2.0 Engine"]
     end
 
-    WebClient -->|HTTP/2 REST Mutations| LoadBalancer
+    WebClient -->|HTTP2 REST Mutations| LoadBalancer
     WebClient -->|WebSocket WSS Live Stream| LoadBalancer
     MobileClient --> LoadBalancer
 
@@ -472,7 +472,7 @@ classDiagram
     Column "1" *-- "*" Task : displays
     Task "1" *-- "*" TaskAssignee : has
     Task "1" *-- "*" TaskLabel : tagged_with
-    Label "1" <-- "*" TaskLabel : classifies
+    TaskLabel "*" --> "1" Label : classifies
     Task "1" *-- "*" Comment : discusses
     Task "1" *-- "*" Checklist : breaks_down
     Checklist "1" *-- "*" ChecklistItem : comprises
