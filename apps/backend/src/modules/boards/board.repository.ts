@@ -89,7 +89,6 @@ export class BoardRepository {
         },
       });
 
-      // Default Kanban columns
       const defaultColumns = [
         { name: "To Do", position: 1000.0 },
         { name: "In Progress", position: 2000.0 },

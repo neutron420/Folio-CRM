@@ -99,7 +99,6 @@ export class ProjectService {
 
     const member = await requireWorkspaceMember(project.workspaceId, userId, "MEMBER");
 
-    // Can only update if creator or ADMIN/OWNER
     const isCreator = project.createdBy === userId;
     const isAdmin = hasMinimumRole(member.role, "ADMIN");
     if (!isCreator && !isAdmin) {

@@ -6,6 +6,7 @@ import {
 import { logger } from "@kanban/logger";
 import { requireWorkspaceMember } from "../../middleware/rbac";
 import { columnRepository } from "../columns/column.repository";
+import { realtimeBroker } from "../realtime/realtime.broker";
 import { taskRepository } from "./task.repository";
 import type {
   CreateTaskInput,
@@ -54,7 +55,6 @@ export class TaskService {
       }
     );
 
-    // Log activity
     await taskRepository.logActivity({
       workspaceId,
       projectId: column.board.project.id,
@@ -67,7 +67,7 @@ export class TaskService {
 
     logger.info("Task created", { taskId: created.id, columnId, title });
 
-    return {
+    const result: TaskDetail = {
       id: created.id,
       boardId: created.boardId,
       columnId: created.columnId,
@@ -93,6 +93,9 @@ export class TaskService {
       createdAt: created.createdAt.toISOString(),
       updatedAt: created.updatedAt.toISOString(),
     };
+
+    realtimeBroker.broadcastToBoard(created.boardId, "TASK_CREATED", { task: result });
+    return result;
   }
 
   async getTask(taskId: string, userId: string): Promise<TaskDetail> {
@@ -170,7 +173,7 @@ export class TaskService {
       metadata: { fields: Object.keys(input) },
     });
 
-    return {
+    const result: TaskDetail = {
       id: updated.id,
       boardId: updated.boardId,
       columnId: updated.columnId,
@@ -196,6 +199,9 @@ export class TaskService {
       createdAt: updated.createdAt.toISOString(),
       updatedAt: updated.updatedAt.toISOString(),
     };
+
+    realtimeBroker.broadcastToBoard(task.boardId, "TASK_UPDATED", { task: result });
+    return result;
   }
 
   async moveTask(
@@ -235,7 +241,7 @@ export class TaskService {
       }
       const diff = Math.abs(next.position - prev.position);
       if (diff < 0.0001) {
-        // Automatically rebalance column to restore floating-point precision
+        
         await taskRepository.rebalanceColumn(targetColumnId);
         const reloadedPrev = await taskRepository.findById(input.prevTaskId);
         const reloadedNext = await taskRepository.findById(input.nextTaskId);
@@ -251,7 +257,7 @@ export class TaskService {
       const next = await taskRepository.findById(input.nextTaskId);
       newPosition = next ? next.position / 2 : 1000.0;
     } else {
-      // Dropping into an empty column or end of target column
+      
       const lastInTarget = await taskRepository.findLastInColumn(targetColumnId);
       newPosition = lastInTarget ? lastInTarget.position + 1000.0 : 1000.0;
     }
@@ -279,7 +285,7 @@ export class TaskService {
       newPosition,
     });
 
-    return {
+    const result: TaskDetail = {
       id: moved.id,
       boardId: moved.boardId,
       columnId: moved.columnId,
@@ -305,6 +311,17 @@ export class TaskService {
       createdAt: moved.createdAt.toISOString(),
       updatedAt: moved.updatedAt.toISOString(),
     };
+
+    realtimeBroker.broadcastToBoard(task.boardId, "TASK_MOVED", {
+      taskId: moved.id,
+      boardId: task.boardId,
+      fromColumnId: task.columnId,
+      toColumnId: targetColumnId,
+      position: newPosition,
+      movedBy: { id: userId },
+    });
+
+    return result;
   }
 
   async deleteTask(taskId: string, userId: string): Promise<void> {
@@ -326,6 +343,11 @@ export class TaskService {
     });
 
     await taskRepository.delete(taskId);
+
+    realtimeBroker.broadcastToBoard(task.boardId, "TASK_DELETED", {
+      taskId,
+      boardId: task.boardId,
+    });
 
     logger.info("Task deleted", { taskId, userId });
   }

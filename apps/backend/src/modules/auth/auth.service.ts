@@ -16,11 +16,9 @@ import type {
 
 export class AuthService {
 
-
   generateState(): string {
     return randomBytes(32).toString("hex");
   }
-
 
   getGoogleAuthUrl(state: string): string {
     const env = getEnv();
@@ -39,7 +37,6 @@ export class AuthService {
   async exchangeGoogleCode(code: string): Promise<OAuthUserProfile> {
     const env = getEnv();
 
-    // Exchange authorization code for tokens
     const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -60,7 +57,6 @@ export class AuthService {
 
     const tokens = (await tokenRes.json()) as GoogleTokenResponse;
 
-    // Fetch user profile
     const userRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
       headers: { Authorization: `Bearer ${tokens.access_token}` },
     });
@@ -83,7 +79,6 @@ export class AuthService {
       avatarUrl: googleUser.picture || null,
     };
   }
-
 
   getGitHubAuthUrl(state: string): string {
     const env = getEnv();
@@ -123,7 +118,6 @@ export class AuthService {
       throw new UnauthorizedError("GitHub did not return an access token");
     }
 
-    // Fetch user profile
     const userRes = await fetch("https://api.github.com/user", {
       headers: {
         Authorization: `Bearer ${tokens.access_token}`,
@@ -137,7 +131,6 @@ export class AuthService {
 
     const ghUser = (await userRes.json()) as GitHubUser;
 
-    // Fetch verified primary email
     let email = ghUser.email;
 
     if (!email) {
@@ -168,16 +161,15 @@ export class AuthService {
     };
   }
 
-
   async resolveOAuthUser(profile: OAuthUserProfile): Promise<AuthResult> {
-    // 1. Check if this OAuth account already exists
+    
     const existingOAuth = await authRepository.findOAuthAccount(
       profile.provider,
       profile.providerAccountId
     );
 
     if (existingOAuth) {
-      // Existing linked account — create session and return
+      
       const sessionToken = generateSessionToken();
       await authRepository.createSession(existingOAuth.user.id, sessionToken);
 
@@ -189,11 +181,10 @@ export class AuthService {
       return { sessionToken, user: existingOAuth.user };
     }
 
-    // 2. Check if a user exists with this email (link new provider)
     const existingUser = await authRepository.findUserByEmail(profile.email);
 
     if (existingUser) {
-      // Link new OAuth provider to existing user
+      
       await authRepository.linkOAuthAccount(
         existingUser.id,
         profile.provider,
@@ -211,7 +202,6 @@ export class AuthService {
       return { sessionToken, user: existingUser };
     }
 
-    // 3. Brand new user — create user + OAuth + default workspace
     const newUser = await authRepository.createUserWithOAuth({
       email: profile.email,
       name: profile.name,
@@ -230,7 +220,6 @@ export class AuthService {
 
     return { sessionToken, user: newUser };
   }
-
 
   async validateSession(rawToken: string): Promise<SessionWithUser | null> {
     return authRepository.validateSession(rawToken);

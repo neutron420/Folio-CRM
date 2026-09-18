@@ -72,7 +72,6 @@ export class TaskRepository {
         },
       });
 
-      // Add assignees if provided
       if (input.assigneeIds && input.assigneeIds.length > 0) {
         for (const userId of input.assigneeIds) {
           await tx.taskAssignee.create({
@@ -84,7 +83,6 @@ export class TaskRepository {
         }
       }
 
-      // Add labels if provided
       if (input.labelIds && input.labelIds.length > 0) {
         for (const labelId of input.labelIds) {
           await tx.taskLabel.create({

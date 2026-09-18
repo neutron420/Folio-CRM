@@ -2,10 +2,9 @@ import { requireAuth } from "../../middleware/auth";
 import { handleError } from "../../middleware/error-handler";
 import { boardController } from "./board.controller";
 import { columnController } from "../columns";
+import { activityController } from "../activities";
+import { analyticsController } from "../analytics";
 
-/**
- * Handles all /api/v1/boards/* requests.
- */
 export async function handleBoardRoutes(
   req: Request,
   pathname: string,
@@ -18,7 +17,6 @@ export async function handleBoardRoutes(
   try {
     const { user } = await requireAuth(req);
 
-    // /api/v1/boards/:boardId
     const segments = pathname.replace("/api/v1/boards/", "").split("/");
     const boardId = segments[0];
 
@@ -38,10 +36,21 @@ export async function handleBoardRoutes(
       }
     }
 
-    // /api/v1/boards/:boardId/columns
     if (segments.length === 2 && segments[1] === "columns") {
       if (req.method === "POST") {
         return await columnController.createColumn(req, user, boardId);
+      }
+    }
+
+    if (segments.length === 2 && segments[1] === "activities") {
+      if (req.method === "GET") {
+        return await activityController.getBoardActivities(req, boardId, requestId);
+      }
+    }
+
+    if (segments.length === 2 && segments[1] === "analytics") {
+      if (req.method === "GET") {
+        return await analyticsController.getBoardAnalytics(req, boardId, requestId);
       }
     }
 

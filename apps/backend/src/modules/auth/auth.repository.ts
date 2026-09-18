@@ -2,11 +2,9 @@ import { prisma } from "@kanban/db";
 import { createHash, randomBytes } from "crypto";
 import type { OAuthProviderType, SessionWithUser } from "./auth.types";
 
-
 export function hashToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
 }
-
 
 export function generateSessionToken(): string {
   return randomBytes(32).toString("hex");
@@ -23,16 +21,13 @@ export class AuthRepository {
     });
   }
 
-
   async findUserByEmail(email: string) {
     return prisma.user.findUnique({ where: { email } });
   }
 
-
   async findUserById(id: string) {
     return prisma.user.findUnique({ where: { id } });
   }
-
 
   async createUserWithOAuth(data: {
     email: string;
@@ -58,7 +53,6 @@ export class AuthRepository {
         },
       });
 
-      // Create default personal workspace
       const slug = data.name
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
@@ -93,7 +87,7 @@ export class AuthRepository {
 
   async createSession(userId: string, rawToken: string): Promise<{ id: string; expiresAt: Date }> {
     const tokenHash = hashToken(rawToken);
-    const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 14); // 14 days
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 14); 
 
     const session = await prisma.session.create({
       data: {
@@ -116,7 +110,7 @@ export class AuthRepository {
 
     if (!session) return null;
     if (session.expiresAt < new Date()) {
-      // Expired — clean up
+      
       await prisma.session.delete({ where: { id: session.id } }).catch(() => {});
       return null;
     }

@@ -4,12 +4,10 @@ import { UnauthorizedError } from "@kanban/errors";
 import { randomBytes } from "crypto";
 import { authService } from "./auth.service";
 
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 14; // 14 days in seconds
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 14; 
 
-// In-memory state store for CSRF (works for single-server; swap to Redis later if needed)
 const pendingStates = new Map<string, { createdAt: number }>();
 
-// Clean up expired states every 5 minutes
 setInterval(() => {
   const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
   for (const [key, val] of pendingStates) {
@@ -53,9 +51,7 @@ export function getSessionTokenFromRequest(req: Request): string | null {
 }
 
 export class AuthController {
-  // ==========================================
-  // GET /api/v1/auth/google — Redirect to Google
-  // ==========================================
+  
   async initiateGoogle(_req: Request): Promise<Response> {
     const state = authService.generateState();
     pendingStates.set(state, { createdAt: Date.now() });
@@ -68,9 +64,6 @@ export class AuthController {
     });
   }
 
-  // ==========================================
-  // GET /api/v1/auth/google/callback
-  // ==========================================
   async googleCallback(req: Request): Promise<Response> {
     const env = getEnv();
     const url = new URL(req.url);
@@ -81,16 +74,13 @@ export class AuthController {
       throw new UnauthorizedError("Missing code or state parameter");
     }
 
-    // Validate CSRF state
     if (!pendingStates.has(state)) {
       throw new UnauthorizedError("Invalid or expired OAuth state");
     }
     pendingStates.delete(state);
 
-    // Exchange code for user profile
     const profile = await authService.exchangeGoogleCode(code);
 
-    // Resolve user (find/create/link) and create session
     const { sessionToken, user } = await authService.resolveOAuthUser(profile);
 
     logger.info("Google OAuth login successful", { userId: user.id, email: user.email });
@@ -104,9 +94,6 @@ export class AuthController {
     });
   }
 
-  // ==========================================
-  // GET /api/v1/auth/github — Redirect to GitHub
-  // ==========================================
   async initiateGitHub(_req: Request): Promise<Response> {
     const state = authService.generateState();
     pendingStates.set(state, { createdAt: Date.now() });
@@ -119,9 +106,6 @@ export class AuthController {
     });
   }
 
-  // ==========================================
-  // GET /api/v1/auth/github/callback
-  // ==========================================
   async githubCallback(req: Request): Promise<Response> {
     const env = getEnv();
     const url = new URL(req.url);
@@ -151,9 +135,6 @@ export class AuthController {
     });
   }
 
-  // ==========================================
-  // GET /api/v1/auth/me — Get current user
-  // ==========================================
   async me(req: Request): Promise<Response> {
     const token = getSessionTokenFromRequest(req);
     if (!token) {
@@ -179,9 +160,6 @@ export class AuthController {
     });
   }
 
-  // ==========================================
-  // POST /api/v1/auth/logout
-  // ==========================================
   async logout(req: Request): Promise<Response> {
     const token = getSessionTokenFromRequest(req);
     if (token) {

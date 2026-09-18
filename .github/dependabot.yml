@@ -1,0 +1,46 @@
+version: 2
+updates:
+  # Maintain dependencies for root monorepo
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(deps)"
+    open-pull-requests-limit: 10
+
+  # Maintain dependencies for backend application
+  - package-ecosystem: "npm"
+    directory: "/apps/backend"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(backend-deps)"
+    open-pull-requests-limit: 10
+
+  # Maintain dependencies for web application
+  - package-ecosystem: "npm"
+    directory: "/apps/web"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(web-deps)"
+    open-pull-requests-limit: 10
+
+  # Maintain dependencies for database package
+  - package-ecosystem: "npm"
+    directory: "/packages/db"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(db-deps)"
+    open-pull-requests-limit: 5
+
+  # Maintain GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci(actions)"
+    open-pull-requests-limit: 5

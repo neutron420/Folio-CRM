@@ -108,7 +108,7 @@ export class ColumnService {
     } else if (input.prevPosition !== undefined && input.nextPosition !== undefined) {
       const diff = Math.abs(input.nextPosition - input.prevPosition);
       if (diff < 0.0001) {
-        // Trigger rebalance first
+        
         await columnRepository.rebalance(column.boardId);
         const reloaded = await columnRepository.findById(columnId);
         return {

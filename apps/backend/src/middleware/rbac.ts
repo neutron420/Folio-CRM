@@ -25,7 +25,7 @@ export async function requireWorkspaceMember(
   });
 
   if (!member) {
-    // Check if workspace even exists
+    
     const workspace = await prisma.workspace.findUnique({
       where: { id: workspaceId },
       select: { id: true },

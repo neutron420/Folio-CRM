@@ -2,10 +2,8 @@ import { requireAuth } from "../../middleware/auth";
 import { handleError } from "../../middleware/error-handler";
 import { projectController } from "./project.controller";
 import { boardController } from "../boards";
+import { analyticsController } from "../analytics";
 
-/**
- * Handles all /api/v1/projects/* requests.
- */
 export async function handleProjectRoutes(
   req: Request,
   pathname: string,
@@ -37,13 +35,18 @@ export async function handleProjectRoutes(
       }
     }
 
-    // /api/v1/projects/:projectId/boards
     if (segments.length === 2 && segments[1] === "boards") {
       if (req.method === "GET") {
         return await boardController.listBoards(req, user, projectId);
       }
       if (req.method === "POST") {
         return await boardController.createBoard(req, user, projectId);
+      }
+    }
+
+    if (segments.length === 2 && segments[1] === "analytics") {
+      if (req.method === "GET") {
+        return await analyticsController.getProjectAnalytics(req, projectId, requestId);
       }
     }
 

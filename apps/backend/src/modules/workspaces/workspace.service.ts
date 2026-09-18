@@ -231,18 +231,14 @@ export class WorkspaceService {
       throw new ValidationError("Invalid workspace role specified");
     }
 
-    // Role safety rules:
-    // 1. Only an OWNER can make someone an OWNER
     if (newRole === "OWNER" && callerMember.role !== "OWNER") {
       throw new ForbiddenError("Only an OWNER can promote a member to OWNER");
     }
 
-    // 2. An ADMIN cannot modify an OWNER
     if (targetMember.role === "OWNER" && callerMember.role !== "OWNER") {
       throw new ForbiddenError("Only an OWNER can modify another OWNER's role");
     }
 
-    // 3. Cannot demote the sole owner
     if (targetMember.role === "OWNER" && newRole !== "OWNER") {
       const ownerCount = await workspaceRepository.countOwners(workspaceId);
       if (ownerCount <= 1) {
@@ -301,7 +297,6 @@ export class WorkspaceService {
       return;
     }
 
-    // Caller is removing someone else
     const callerMember = await requireWorkspaceMember(workspaceId, userId, "ADMIN");
     const targetMember = await workspaceRepository.findMember(workspaceId, targetUserId);
 

@@ -2,33 +2,32 @@ import { requireAuth } from "../../middleware/auth";
 import { handleError } from "../../middleware/error-handler";
 import { workspaceController } from "./workspace.controller";
 import { projectController } from "../projects";
-
+import { labelController } from "../labels";
+import { activityController } from "../activities";
+import { searchController } from "../search";
 
 export async function handleWorkspaceRoutes(
   req: Request,
   pathname: string,
   requestId: string
 ): Promise<Response | null> {
-  // Check if pathname belongs to workspaces
+  
   if (!pathname.startsWith("/api/v1/workspaces")) {
     return null;
   }
 
   try {
-    // All workspace endpoints require an authenticated user
+    
     const { user } = await requireAuth(req);
 
-    // 1. GET /api/v1/workspaces - List workspaces
     if (pathname === "/api/v1/workspaces" && req.method === "GET") {
       return await workspaceController.listWorkspaces(req, user);
     }
 
-    // 2. POST /api/v1/workspaces - Create workspace
     if (pathname === "/api/v1/workspaces" && req.method === "POST") {
       return await workspaceController.createWorkspace(req, user);
     }
 
-    // Match /api/v1/workspaces/:workspaceId/...
     const segments = pathname.replace("/api/v1/workspaces/", "").split("/");
     const workspaceId = segments[0];
 
@@ -36,7 +35,6 @@ export async function handleWorkspaceRoutes(
       return null;
     }
 
-    // 3. /api/v1/workspaces/:workspaceId
     if (segments.length === 1) {
       if (req.method === "GET") {
         return await workspaceController.getWorkspace(req, user, workspaceId);
@@ -49,7 +47,6 @@ export async function handleWorkspaceRoutes(
       }
     }
 
-    // 4. /api/v1/workspaces/:workspaceId/members
     if (segments.length === 2 && segments[1] === "members") {
       if (req.method === "GET") {
         return await workspaceController.listMembers(req, user, workspaceId);
@@ -59,7 +56,6 @@ export async function handleWorkspaceRoutes(
       }
     }
 
-    // 5. /api/v1/workspaces/:workspaceId/members/:targetUserId
     if (segments.length === 3 && segments[1] === "members") {
       const targetUserId = segments[2];
       if (!targetUserId) return null;
@@ -71,7 +67,6 @@ export async function handleWorkspaceRoutes(
       }
     }
 
-    // 6. /api/v1/workspaces/:workspaceId/projects
     if (segments.length === 2 && segments[1] === "projects") {
       if (req.method === "GET") {
         return await projectController.listProjects(req, user, workspaceId);
@@ -81,7 +76,28 @@ export async function handleWorkspaceRoutes(
       }
     }
 
-    return null; // Route within /api/v1/workspaces did not match method/path
+    if (segments.length === 2 && segments[1] === "labels") {
+      if (req.method === "GET") {
+        return await labelController.listLabels(req, user, workspaceId);
+      }
+      if (req.method === "POST") {
+        return await labelController.createLabel(req, user, workspaceId);
+      }
+    }
+
+    if (segments.length === 2 && segments[1] === "activities") {
+      if (req.method === "GET") {
+        return await activityController.getWorkspaceActivities(req, workspaceId, requestId);
+      }
+    }
+
+    if (segments.length === 2 && segments[1] === "search") {
+      if (req.method === "GET") {
+        return await searchController.search(req, workspaceId, requestId);
+      }
+    }
+
+    return null; 
   } catch (err) {
     return handleError(err, requestId);
   }
