@@ -552,8 +552,8 @@ sequenceDiagram
     participant Peers as Subscribed Peers (Board Room)
 
     User->>Web: Drops task between Task A and Task B
-    Web->>API: PATCH /api/v1/tasks/:id/move { prevTaskId, nextTaskId, targetColumnId }
-    API->>RBAC: Validate Session & Workspace Role
+    Web->>API: PATCH /api/v1/tasks/:id/move (prevTaskId, nextTaskId, targetColumnId)
+    API->>RBAC: Validate Session and Workspace Role
     RBAC-->>API: Authorized (MEMBER+)
     API->>Svc: moveTask(taskId, userId, input)
     
@@ -561,22 +561,22 @@ sequenceDiagram
     Repo->>DB: SELECT position FROM tasks WHERE id IN (prev, next)
     DB-->>Repo: P_prev = 1000.00005, P_next = 1000.00009
     
-    Note over Svc: Delta = 0.00004 < 0.0001 (Cluster Detected!)
+    Note over Svc: Delta = 0.00004 below 0.0001 threshold (Cluster Detected)
     
     Svc->>Repo: rebalanceColumn(targetColumnId)
-    Repo->>DB: BEGIN TRANSACTION; UPDATE tasks SET position = (i+1)*1000; COMMIT;
+    Repo->>DB: Atomic Transaction: UPDATE tasks SET position = (i+1)*1000
     DB-->>Repo: Rebalance Complete
     
     Svc->>Svc: Re-calculate P_mid = (2000.0 + 3000.0) / 2 = 2500.0
     Svc->>Repo: moveTask(taskId, targetColumnId, 2500.0)
-    Repo->>DB: UPDATE tasks SET columnId = $1, position = 2500.0 WHERE id = $2
+    Repo->>DB: UPDATE tasks SET columnId = col_id, position = 2500.0 WHERE id = task_id
     DB-->>Repo: Row Updated
     
     Svc->>Repo: logActivity("TASK_MOVED", metadata)
-    Repo->>DB: INSERT INTO activities (...) VALUES (...)
+    Repo->>DB: INSERT INTO activities record
     
     Svc->>Broker: broadcastToBoard(boardId, "TASK_MOVED", taskDetail)
-    Broker-->>Peers: WS Frame: { event: "TASK_MOVED", payload: taskDetail }
+    Broker-->>Peers: WS Frame: event TASK_MOVED
     
     Svc-->>API: TaskDetail DTO
     API-->>Web: HTTP 200 OK (Updated Task)
@@ -600,30 +600,30 @@ sequenceDiagram
     participant DB as Neon PostgreSQL
 
     User->>Web: Selects 25MB attachment (e.g. spec.pdf)
-    Web->>API: POST /api/v1/tasks/:taskId/attachments/presign\n{ filename: "spec.pdf", contentType: "application/pdf", sizeBytes: 26214400 }
+    Web->>API: POST /api/v1/tasks/:taskId/attachments/presign (filename, contentType, sizeBytes)
     
     API->>Svc: createPresignedUpload(taskId, userId, input)
-    Note over Svc: Validate size <= 50MB & allowed MIME types
+    Note over Svc: Validate size up to 50MB and allowed MIME types
     
     Svc->>Store: generateUploadUrl(storageKey, contentType)
-    Store->>Store: Generate AWS SigV4 HMAC-SHA256 Signed PUT URL (Expires: 900s)
-    Store-->>Svc: { uploadUrl, storageKey, expiresInSeconds: 900 }
+    Store->>Store: Generate AWS SigV4 HMAC-SHA256 Signed PUT URL (Expires in 900s)
+    Store-->>Svc: Presigned credentials (uploadUrl, storageKey, expiresInSeconds)
     
-    Svc->>DB: INSERT INTO attachments (taskId, storageKey, filename, sizeBytes, ...)
+    Svc->>DB: INSERT INTO attachments record
     DB-->>Svc: Attachment Record Created
     
     Svc-->>API: PresignUploadResponse
-    API-->>Web: HTTP 200 OK { uploadUrl, storageKey, attachment }
+    API-->>Web: HTTP 200 OK (uploadUrl, storageKey, attachment)
     
-    Note over Web,S3: Direct Binary Upload (Zero API Server CPU/Memory overhead)
-    Web->>S3: HTTP PUT {uploadUrl} with Raw Binary Body
+    Note over Web,S3: Direct Binary Upload (Zero API Server CPU and Memory overhead)
+    Web->>S3: HTTP PUT uploadUrl with Raw Binary Body
     S3-->>Web: HTTP 200 OK (ETag returned)
     
     Web->>API: GET /api/v1/tasks/:taskId/attachments
     API->>Svc: listTaskAttachments(taskId, userId)
     Svc->>Store: generateDownloadUrl(storageKey)
     Store-->>Svc: Signed GET Download URL
-    Svc-->>API: AttachmentDTO[] with fresh download URLs
+    Svc-->>API: AttachmentDTO list with fresh download URLs
     API-->>Web: HTTP 200 OK
     Web-->>User: Render Attachment with Download Trigger
 ```
@@ -645,37 +645,37 @@ sequenceDiagram
     User->>API: GET /api/v1/auth/google
     API->>Auth: generateState() -> 32-byte CSPRNG hex string
     Auth-->>API: stateToken
-    API-->>User: HTTP 302 Redirect to accounts.google.com with state & client_id
+    API-->>User: HTTP 302 Redirect to accounts.google.com with state and client_id
 
-    User->>IdP: Authenticates & Approves Scopes
+    User->>IdP: Authenticates and Approves Scopes
     IdP-->>User: HTTP 302 Redirect to /api/v1/auth/callback/google?code=XYZ&state=ABC
 
     User->>API: GET /api/v1/auth/callback/google?code=XYZ&state=ABC
     API->>Auth: exchangeGoogleCode(code)
     Auth->>IdP: POST https://oauth2.googleapis.com/token (code, client_secret)
-    IdP-->>Auth: { access_token, id_token }
+    IdP-->>Auth: Token Response (access_token, id_token)
     
     Auth->>IdP: GET https://www.googleapis.com/oauth2/v3/userinfo
-    IdP-->>Auth: { sub: "google_123", email: "eng@zelo.dev", email_verified: true, name: "Zelo Eng" }
+    IdP-->>Auth: User Profile (sub, email, email_verified, name)
 
     Auth->>Repo: resolveOAuthUser(profile)
-    Repo->>DB: SELECT * FROM oauth_accounts WHERE provider = 'GOOGLE' AND providerAccountId = 'google_123'
+    Repo->>DB: SELECT from oauth_accounts WHERE provider = GOOGLE
     alt Existing Account Found
-        DB-->>Repo: Existing User
+        DB-->>Repo: Existing User Record
     else New Account
-        Repo->>DB: INSERT INTO users ...; INSERT INTO oauth_accounts ...
+        Repo->>DB: INSERT INTO users and oauth_accounts
         DB-->>Repo: New User Record
     end
 
     Auth->>Auth: generateSessionToken() -> 256-bit CSPRNG token (Raw)
     Auth->>Auth: hashToken(rawToken) -> SHA-256 Digest
-    Auth->>Repo: createSession(userId, tokenHash, expiresAt: 30 days)
-    Repo->>DB: INSERT INTO sessions (userId, tokenHash, expiresAt) VALUES (...)
+    Auth->>Repo: createSession(userId, tokenHash, expiresAt)
+    Repo->>DB: INSERT INTO sessions (userId, tokenHash, expiresAt)
     DB-->>Repo: Session Persisted
 
     Auth-->>API: rawSessionToken
-    Note over API,User: Set-Cookie: zelo_session=RAW; HttpOnly; Secure; SameSite=Lax; Max-Age=2592000
-    API-->>User: HTTP 302 Redirect to http://localhost:3000/dashboard
+    Note over API,User: Set-Cookie: zelo_session=RAW, HttpOnly, Secure, SameSite=Lax, Max-Age=2592000
+    API-->>User: HTTP 302 Redirect to dashboard
 ```
 
 ---
