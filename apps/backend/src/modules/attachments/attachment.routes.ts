@@ -5,7 +5,7 @@ export async function handleAttachmentRoutes(
   pathname: string,
   requestId: string
 ): Promise<Response | null> {
-  const parts = pathname.replace(/^\/api\/v1\
+  const parts = pathname.replace("/api/v1/", "").split("/");
 
   if (
     parts[0] === "tasks" &&

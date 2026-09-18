@@ -5,7 +5,7 @@ export async function handleActivityRoutes(
   pathname: string,
   requestId: string
 ): Promise<Response | null> {
-  const parts = pathname.replace(/^\/api\/v1\
+  const parts = pathname.replace("/api/v1/", "").split("/");
   const targetId = parts[1];
   if (!targetId) return null;
 
