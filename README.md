@@ -60,16 +60,16 @@ Zelo powers high-throughput engineering teams by bridging deep project managemen
 ```mermaid
 flowchart TB
     subgraph Clients ["Client Applications"]
-        WebClient["Next.js 16 (React 19) App Router\nWeb Client (Port 3000)"]
-        MobileClient["Modern Mobile / Desktop Clients\n(Future Native Wrappers)"]
+        WebClient["Next.js 16 React 19 App Router<br/>Web Client (Port 3000)"]
+        MobileClient["Modern Mobile and Desktop Clients<br/>Future Native Wrappers"]
     end
 
-    subgraph Gateway ["Edge & Routing Layer"]
-        LoadBalancer["Reverse Proxy / Cloudflare Edge\nSSL/TLS Termination & DDoS Shield"]
+    subgraph Gateway ["Edge and Routing Layer"]
+        LoadBalancer["Reverse Proxy and Cloudflare Edge<br/>TLS Termination and DDoS Shield"]
     end
 
     subgraph BackendCluster ["Bun Application Server (Port 4000)"]
-        Router["Native Bun HTTP & WebSocket Dispatcher"]
+        Router["Native Bun HTTP and WebSocket Dispatcher"]
         
         subgraph Middlewares ["Middleware Pipeline"]
             MW_ReqID["Request ID Decorator"]
@@ -80,29 +80,29 @@ flowchart TB
         end
 
         subgraph Modules ["Modular Domain Engines"]
-            Mod_Auth["Auth & Identity Engine"]
-            Mod_Workspace["Workspace & Member Engine"]
-            Mod_Project["Project & Sprint Engine"]
-            Mod_Board["Board & Column Engine"]
-            Mod_Task["Task & Kanban Ordering Engine"]
-            Mod_Checklist["Checklist & Dependency Engine"]
-            Mod_Comment["Comment & Label Engine"]
-            Mod_Activity["Audit Log & Activity Engine"]
+            Mod_Auth["Auth and Identity Engine"]
+            Mod_Workspace["Workspace and Member Engine"]
+            Mod_Project["Project and Sprint Engine"]
+            Mod_Board["Board and Column Engine"]
+            Mod_Task["Task and Kanban Ordering Engine"]
+            Mod_Checklist["Checklist and Dependency Engine"]
+            Mod_Comment["Comment and Label Engine"]
+            Mod_Activity["Audit Log and Activity Engine"]
             Mod_Notify["In-App Notification Engine"]
-            Mod_Analytics["Velocity & Analytics Engine"]
-            Mod_Search["Search Engine (Trigram / ILIKE)"]
-            Mod_Attach["Attachment & Presign Engine"]
+            Mod_Analytics["Velocity and Analytics Engine"]
+            Mod_Search["Search Engine (Trigram and ILIKE)"]
+            Mod_Attach["Attachment and Presign Engine"]
         end
 
         subgraph RealtimeSystem ["Real-Time Multiplexing"]
-            WS_Broker["In-Memory RealtimeBroker\nConnection Pool & Room Subscriptions"]
+            WS_Broker["In-Memory RealtimeBroker<br/>Connection Pool and Room Subscriptions"]
         end
     end
 
-    subgraph DataLayer ["Data & Storage Layer"]
-        PrismaClient["Prisma ORM 6.0 Client Singleton\n(@kanban/db)"]
-        NeonDB[("Neon Serverless PostgreSQL\nPgBouncer Pooler + Direct URL")]
-        S3Storage[("AWS S3 / Cloudflare R2\nPresigned Object Storage")]
+    subgraph DataLayer ["Data and Storage Layer"]
+        PrismaClient["Prisma ORM 6.0 Client Singleton<br/>@kanban/db"]
+        NeonDB[("Neon Serverless PostgreSQL<br/>PgBouncer Pooler and Direct URL")]
+        S3Storage[("AWS S3 and Cloudflare R2<br/>Presigned Object Storage")]
     end
 
     subgraph IdPs ["External Identity Providers"]
@@ -110,24 +110,27 @@ flowchart TB
         GitHubIdP["GitHub OAuth 2.0 Engine"]
     end
 
-    WebClient -->|HTTP/2 REST (Mutations/Queries)| LoadBalancer
-    WebClient <-->|WebSocket WSS (Live Broadcasts)| LoadBalancer
+    WebClient -->|HTTP/2 REST Mutations| LoadBalancer
+    WebClient -->|WebSocket WSS Live Stream| LoadBalancer
     MobileClient --> LoadBalancer
 
     LoadBalancer --> Router
     Router --> Middlewares
     Middlewares --> Modules
 
-    Mod_Auth <-->|OAuth Handshake| IdPs
+    Mod_Auth -->|OAuth Authorization Code| IdPs
+    IdPs -->|OAuth Tokens and Profiles| Mod_Auth
     Mod_Task --> RealtimeSystem
     Mod_Comment --> RealtimeSystem
     Mod_Notify --> RealtimeSystem
 
-    RealtimeSystem <-->|Multicast to Subscribed Rooms| Router
+    RealtimeSystem -->|Multicast WebSocket Frames| Router
+    Router -->|Live Updates| WebClient
+
     Modules --> PrismaClient
     PrismaClient --> NeonDB
-    Mod_Attach -.->|Presigned URLs| S3Storage
-    WebClient -.->|Direct Binary Stream PUT/GET| S3Storage
+    Mod_Attach -.->|Presigned Upload and Download URLs| S3Storage
+    WebClient -.->|Direct Binary File Upload| S3Storage
 ```
 
 ---
