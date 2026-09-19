@@ -1,4 +1,4 @@
-# Zelo: Enterprise-Grade Real-Time Collaborative Kanban Platform
+# Folio: Enterprise-Grade Real-Time Collaborative Kanban Platform
 
 [![CI Pipeline](https://github.com/neutron420/Zelo/actions/workflows/ci.yml/badge.svg)](https://github.com/neutron420/Zelo/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -10,7 +10,7 @@
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-**Zelo** is a production-grade, distributed, real-time collaborative Kanban engineering platform. Designed with **Domain-Driven Design (DDD)**, **Clean Architecture**, and a **Modular Monolith** pattern inside a high-speed Turborepo monorepo, Zelo delivers sub-millisecond local drag-and-drop operations, real-time multi-client synchronization, passwordless cryptographic authentication, and enterprise-grade multi-tenant role-based access control (RBAC).
+**Folio** is a production-grade, distributed, real-time collaborative Kanban engineering platform. Designed with **Domain-Driven Design (DDD)**, **Clean Architecture**, and a **Modular Monolith** pattern inside a high-speed Turborepo monorepo, Zelo delivers sub-millisecond local drag-and-drop operations, real-time multi-client synchronization, passwordless cryptographic authentication, and enterprise-grade multi-tenant role-based access control (RBAC).
 
 ---
 
