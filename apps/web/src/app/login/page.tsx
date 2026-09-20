@@ -134,7 +134,7 @@ export default function LoginPage() {
                 className='text-xl font-bold tracking-tight text-neutral-900 dark:text-white'
                 style={{ fontFamily: 'var(--font-tiempos), Georgia, serif' }}
               >
-                Folio<span className='text-neutral-500 font-normal text-xs ml-1 uppercase tracking-wider'>CRM</span>
+                Folio<span className='text-neutral-500 font-normal text-xs ml-1 uppercase tracking-wider'></span>
               </span>
             </Link>
 
