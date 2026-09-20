@@ -104,7 +104,7 @@ export function HeroHeader() {
                   size='sm'
                   className={cn('w-full sm:w-auto', isScrolled && 'lg:hidden')}
                 >
-                  <Link href='#' onClick={() => setMenuState(false)}>
+                  <Link href='/login' onClick={() => setMenuState(false)}>
                     <span>Login</span>
                   </Link>
                 </Button>
@@ -113,7 +113,7 @@ export function HeroHeader() {
                   size='sm'
                   className={cn('w-full sm:w-auto', isScrolled && 'lg:hidden')}
                 >
-                  <Link href='#' onClick={() => setMenuState(false)}>
+                  <Link href='/login' onClick={() => setMenuState(false)}>
                     <span>Sign Up</span>
                   </Link>
                 </Button>
@@ -122,7 +122,7 @@ export function HeroHeader() {
                   size='sm'
                   className={cn('hidden', isScrolled && 'lg:inline-flex')}
                 >
-                  <Link href='#'>
+                  <Link href='/login'>
                     <span>Get Started</span>
                   </Link>
                 </Button>

@@ -32,7 +32,7 @@ const plans: PricingPlan[] = [
       'Community support',
     ],
     cta: 'Start Free',
-    ctaLink: '#',
+    ctaLink: '/login',
   },
   {
     name: 'Pro',
@@ -52,7 +52,7 @@ const plans: PricingPlan[] = [
     ],
     highlighted: true,
     cta: 'Start Free Trial',
-    ctaLink: '#',
+    ctaLink: '/login',
     includesFrom: 'Everything in Free, plus:',
   },
   {
@@ -72,7 +72,7 @@ const plans: PricingPlan[] = [
       'Custom integrations',
     ],
     cta: 'Contact Sales',
-    ctaLink: '#',
+    ctaLink: '/contact',
     includesFrom: 'Everything in Pro, plus:',
   },
 ];

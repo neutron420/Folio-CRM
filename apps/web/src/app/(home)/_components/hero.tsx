@@ -30,7 +30,7 @@ const Hero = () => {
                   </p>
                   <div className='flex items-center justify-center gap-3'>
                     <Button asChild className='shadow-md'>
-                      <Link href='/#features'>Get Started</Link>
+                      <Link href='/login'>Get Started</Link>
                     </Button>
                     <Button variant='outline' asChild className='shadow-sm'>
                       <Link href='/contact' prefetch={false}>

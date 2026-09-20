@@ -191,10 +191,11 @@ export function SiteFooter() {
           whole team can work from.
         </p>
         <Button
+          asChild
           size='lg'
           className='mt-8 rounded-full px-6 py-5 font-medium text-sm'
         >
-          Get started
+          <Link href='/login'>Get started</Link>
         </Button>
       </div>
 
